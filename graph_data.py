@@ -1,13 +1,6 @@
 import numpy as np
 
-def random_wireless_digraph(
-    N: int,
-    L: float,
-    R: float,
-    p_min: float = 0.3,
-    p_max: float = 1.0,
-    rng: np.random.Generator | None = None,
-):
+def random_wireless_digraph(N: int,L: float,R: float,p_min: float = 0.3,p_max: float = 1.0,rng: np.random.Generator | None = None,):
     """
     Generate a random wireless topology as in Section VI:
 

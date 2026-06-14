@@ -1,11 +1,9 @@
-# experiments.py
-
 import numpy as np
 from markov import hitting_times_for_digraph_and_undirected
 from graph_data import random_wireless_digraph
 
 
-def is_strongly_connected(W: np.ndarray) -> bool:
+def is_strongly_connected(W):
     """
     Simple strong-connectivity check via reachability.
     Returns True if every node can reach every other node.
@@ -17,7 +15,7 @@ def is_strongly_connected(W: np.ndarray) -> bool:
     return bool(np.all(reach > 0))
 
 
-def relative_error_matrix(H_true: np.ndarray, H_approx: np.ndarray) -> np.ndarray:
+def relative_error_matrix(H_true,H_approx):
     """
     Elementwise relative error |H_approx - H_true| / H_true for H_true > 0.
     """
@@ -28,15 +26,7 @@ def relative_error_matrix(H_true: np.ndarray, H_approx: np.ndarray) -> np.ndarra
     err[mask] = np.abs(H_approx[mask] - H_true[mask]) / H_true[mask]
     return err
 
-
-def run_section_vi_experiment(
-    N: int = 30,
-    L: float = 1.0,
-    R: float = 0.3,
-    trials: int = 100,
-    p_min: float = 0.3,
-    p_max: float = 1.0,
-):
+def run_section_vi_experiment(N: int = 30,L: float = 1.0,R: float = 0.3,trials: int = 100,p_min: float = 0.3,p_max: float = 1.0,):
     max_rel_errors = []
 
     rng = np.random.default_rng()

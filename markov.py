@@ -1,37 +1,42 @@
 import numpy as np
-from numpy.linalg import eig, inv
+from numpy.linalg import inv
 
-def make_transition_P_from_W(W: np.ndarray) -> np.ndarray:
+def make_transition_P_from_W(W):
     """
     Turns matrix W(essentially link quality for each node),
     into a stochastic transition matrix P(each row sums to 1, expressing transition probabilities).
     If a row i has all zeros, make it an absorbing state at i.
     """
-    W = np.array(W, dtype=float)
+    # n is the number of nodes in the graph
     n = W.shape[0]
+    # sums each row of W to get total weights, keepdims for row-wise normalization later
     row_sums = W.sum(axis=1, keepdims=True)
-    P = np.zeros_like(W, dtype=float)
+    # Initialize P as a zero matrix of the same shape(zeros_like) as W
+    P = np.zeros_like(W)
 
-    # Normalize rows with positive total weight
+    # Normalize rows with total weights (transition probabilities)
     mask = row_sums[:, 0] > 0
     P[mask] = W[mask] / row_sums[mask]
 
-    # For rows with sum == 0, create self-loops
+    # For rows with sum = 0, create self-loops (absorbing states)
     for i in range(n):
         if row_sums[i, 0] == 0.0:
             P[i, i] = 1.0
-
     return P
 
-def stationary_distribution(P: np.ndarray, tol: float = 1e-10) -> np.ndarray:
+def stationary_distribution(P):
     """
     Compute stationary distribution pi of an irreducible Markov chain with
     transition matrix P by solving pi^T P = pi^T, sum(pi) = 1.
     """
+    # n is the number of states in the Markov chain
     n = P.shape[0]
-    # Solve (P^T - I)^T pi = 0 with normalization sum(pi) = 1
+    # Create A =  (P^T - I)
     A = P.T - np.eye(n)
-    # Replace one equation by sum(pi)=1
+    """
+    Build linear system for stationary distribution:
+    (P^T - I) * pi = 0, with one row replaced by sum(pi) = 1 to fix the scale.
+    """
     A[-1, :] = np.ones(n)
     b = np.zeros(n)
     b[-1] = 1.0
@@ -41,7 +46,7 @@ def stationary_distribution(P: np.ndarray, tol: float = 1e-10) -> np.ndarray:
     pi = pi / pi.sum()
     return pi
 
-def fundamental_matrix(P: np.ndarray, pi: np.ndarray) -> np.ndarray:
+def fundamental_matrix(P,pi):
     """
     Compute fundamental matrix Z.
     """
@@ -71,14 +76,14 @@ def hitting_times(P: np.ndarray) -> np.ndarray:
                 H[i, j] = (Z[j, j] - Z[i, j]) / pi[j]
     return H
 
-def symmetrize_weights(W: np.ndarray) -> np.ndarray:
+def symmetrize_weights(W):
     """
     Symmetrize a directed weight matrix by averaging W and W^T.
     """
     return 0.5 * (W + W.T)
 
 
-def hitting_times_for_digraph_and_undirected(W: np.ndarray):
+def hitting_times_for_digraph_and_undirected(W):
     """
     - builds Markov chain on the asymmetric digraph
     - builds Markov chain on the symmetrized undirected graph
